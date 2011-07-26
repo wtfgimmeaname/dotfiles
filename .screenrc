@@ -1,0 +1,78 @@
+escape ^jj
+
+shell                 bash
+shelltitle            "$ |sh:"
+
+activity              "activity in %n (%t)"
+bell_msg              "bell in %n (%t)"
+defhstatus            "screen: ^En (^Et)"
+
+vbell           on
+vbell_msg       "WHAT ??!!"
+vbellwait       1
+
+msgminwait      1
+msgwait         3
+
+#termcapinfo xterm-color ti@:te@         # Allow terminal scrolling
+termcapinfo  * '' 'hs:ts=\E_:fs=\E\\:ds=\E_\E\\'
+defscrollback 10000                     # large scroll back
+startup_message off                     # Turn off the splash screen
+bind . sessionname
+
+# Start some screens up
+screen -t "view" 0
+screen -t "modcon" 1
+screen -t "git" 2
+screen -t "console" 3
+screen -t "util" 4
+screen -t "server" 5
+screen -t "remote" 6
+
+backtick 0 30 30 sh -c 'screen -ls | grep --color=no -o "$PPID[^[:space:]]*" | awk -F . "{print \$2}"'
+
+#source $HOME/.ssh/screen_agent
+# use caption to show window list:
+# caption always "%?%F%{.RW}%?%3n %t%? [%h]%?"
+# caption always "%{rk}%H %{gk}%c %{yk}%M%d %{wk}%?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{wk}%?%+Lw%?"
+# caption always "%{=}%{+b kR}%H %{+b kY}%M %d %{+b kG}%2c %{+b kB}%?%-Lw%?%{+b kW}%n*%f %kt%?(%u)%?%{+bkB}%?%+Lw%? | %{kR} Load: %l %{kB}"
+# caption always '%{= mK}%-Lw%{= KW}%50>%n%f* %t%{= mK}%+Lw%<'
+# caption always "%{= kc}%?%-Lw%?%{= kY}%n*%f %t%?(%u)%?%{= kc}%?%+Lw%?"
+caption always "%{= kc}%{+u}%?%-Lw%?%{= kY}%{+u}%n*%f %t%?(%u)%?%{= kc}%{+u}%?%+Lw%?"
+
+hardstatus alwayslastline
+# 'always' keeps the caption even if only one window is shown
+# hardstatus string '%{= mK}%-Lw%{= KW}%50>%n%f* %t%{= mK}%+Lw%< %{= kG}%-=%H %D %d %M %Y %c:%s%{-}'
+# hardstatus string  '%{= Kw}%-Lw%{=b bW}%50>%n: %t%{= Kw}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}'
+# hardstatus string "%{= Kw}%-Lw%{=b bw}%50>%n:%t%{= Kw}%+Lw%< %-=%{+ B}%H:%` %{= kG} %D%d%M%Y %c:%s%{-}"
+# hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?'
+
+# hardstatus string '%{= mK}%-Lw%{= KW}%50>%n%f* %t%{= mK}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}'
+# hardstatus alwayslastline "%?%-Lw%?%n*%f %t%?(%u)%?%?%+Lw%?"
+# hardstatus alwayslastline "%?%{yk}%-Lw%?%{wb}%n*%f %t%?(%u)%?%?%{yk}%+Lw%?"
+# hardstatus alwayslastline " %c | %Y%m%d |  %w"
+# hardstatus alwayslastline " %m%d %c |  %w"
+
+# hardstatus alwayslastline "%{rw}%H%{wk}|%c|%M%d|%?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{wk}%?%+Lw%?"
+# hardstatus alwayslastline "%{rk}%H %{gk}%c %{yk}%M%d %{wk}%?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{wk}%?%+Lw%?"
+# hardstatus alwayslastline "%{rk}host: %H %33=%{yk}date: %M%d %66=%{gk}time: %c:%s%="
+# hardstatus alwayslastline "%{rk}host: %H %33=%{yk}date: %M%d %66=%{gk}time: %c%="
+# hardstatus alwayslastline "%{RY}%16=%H %33=%{YR}%50=%M%d %66=%{Gb}%80=%c%="
+#
+# insert the main url of the screen pages:
+# hardstatus alwayslastline "%{BW}www.causes.com/%50=%{RY}host: %H %85=%{YR}%M%d %92=%{Gb}%c%="
+# hardstatus alwayslastline "%{BW}%50=%{RY}host: %H %85=%{YR}%M%d %92=%{Gb}%c%="
+# hardstatus alwayslastline "%{BW}load: %l%29=%{RY}host: %H %60=%{YR}date: %M%d %80=%{Gb}time: %c%="
+# hardstatus alwayslastline "%{RY}%H %{BW}%l %{Gb}%c %M%d"
+# hardstatus alwayslastline "%{= RY}%H %{BW}%l %{Gb}%c %M%d%="
+#
+# hardstatus alwayslastline "%{Gb}Dustin Weatherford %M%d %c %="
+# hardstatus alwayslastline "%{Gb}%M%d %c -- Me and your mom --%="
+# hardstatus alwayslastline "%{Gb}2010-%m-%d %c -- Agenda 2010 - Total Control%="
+#
+# hardstatus alwayslastline " %m%d %c \033[42;30m %w \033[m"
+# hardstatus alwayslastline "[%c:%s, %D, %d/%m/%y] %w"
+# hardstatus alwayslastline "[%c:%s, %D, %d/%m/%y] %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
+# hardstatus alwayslastline "[%D, %d/%m/%y %C %a]  %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
+# hardstatus string '%{= kY}[ %{R}%H %{Y}][ %{B}%d/%m/%Y %c %{Y}][ %{g}load[%l] %{Y}]'
+hardstatus string '%{r}[ %H ]%{g}[%c:%s, %D, %d/%m/%y]%{b}[ Your mom was here ]'
