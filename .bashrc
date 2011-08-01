@@ -300,7 +300,7 @@ add_path $HOME/.bash/bin
 add_path $HOME/.bash/group/bin
 
 # Set up git completion
-source $HOME/.bash/config/git-completion.bash
+source $HOME/.bash/git-completion.bash
 
 ###### PROMPT ######
 # Set up the prompt colors
@@ -324,7 +324,6 @@ export PS1="$N\t$W|"'$(__git_ps1 " (%s) ")'"$PROMPT_COLOR\u@\h$N:$MY\W$N"'$CURSO
 export PROMPT_COMMAND='if [ $? -ne 0 ]; then CURSOR_PROMPT="^"; else CURSOR_PROMPT=" "; fi'
 
 # Set up autojump; appends $PROMPT_COMMAND
-#source $HOME/.bash/config/autojump.bash
 
 #### Source group
 GROUP_FILE="$HOME/.bash/group/group.bash"
