@@ -25,10 +25,6 @@ then
   source $GLOBAL_BASH_DEF
 fi
 
-if [ -f ~/.bashrc ]; then
-  source ~/.bashrc
-fi
-
 # Create a scrubed hostname
 export HOSTNAME_SCRUB=`hostname | sed -e s/[^a-z0-9_]//g`
 
