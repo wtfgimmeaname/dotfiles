@@ -1,7 +1,7 @@
 escape ^jj
 
 shell                 bash
-shelltitle            "$ |sh:"
+shelltitle            "$ !sh:"
 
 activity              "activity in %n (%t)"
 bell_msg              "bell in %n (%t)"
