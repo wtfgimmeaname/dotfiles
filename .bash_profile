@@ -278,6 +278,12 @@ function psgrep(){
   rm $OUTFILE
 }
 
+function music_rsync() {
+  echo "\nBacking up ~/Music/iTunes into the_amazing_library"
+  echo " ------------------------------------------------"
+  rsync -Curt --progress --human-readable ~/Music/iTunes /Volumes/the_amazing_library
+}
+
 # Set up git completion
 source $HOME/.bash/git-completion.bash
 
