@@ -11,4 +11,10 @@
 --color
 --group
 
---type-set=erb=.html.erb
+# Add Sass and Scss
+--type-add
+css=.scss,.sass
+
+# Exclude compiled directories
+# --ignore-dir
+# template/compiled

@@ -1,6 +1,6 @@
 escape ^jj
 
-shell                 bash
+source                "~/.bash_profile"
 shelltitle            "$ !sh:"
 
 activity              "activity in %n (%t)"
