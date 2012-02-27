@@ -26,9 +26,9 @@ set showcmd                           " extra info in command line
 set nojoinspaces                      " don't autoinsert two spaces after '.', '?', '!' for join command
 set backspace=indent,eol,start
 
-set list                          " show whitespace
+set list                              " show whitespace
 set listchars=nbsp:¬,eol:ϟ,tab:--,extends:»,precedes:«,trail:•
-set wildignore+=*.o,.git,*.pyc,static/css/**,template/compiled/**
+set wildignore+=*.o,.git
 
 fixdel
 filetype on
@@ -45,7 +45,6 @@ match OverLength /\%81v.\+/
 
 autocmd InsertEnter * highlight  CursorLine guifg=none ctermfg=none guibg=none ctermbg=none gui=none cterm=none
 autocmd InsertLeave * highlight  CursorLine guifg=#eeeeee ctermfg=255 guibg=#003853 ctermbg=24  gui=none cterm=none
-let g:netrw_list_hide='\.pyc$'
 
 " Command-T
 let g:CommandTMaxHeight          = 10

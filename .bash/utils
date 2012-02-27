@@ -1,0 +1,112 @@
+#!bash
+
+# Random Functions
+function cl(){ cd "$@" && la; }
+
+# Repeat a command N times.
+function repeat() {
+  local i max
+  max=$1; shift;
+  for ((i=1; i <= max ; i++)); do
+    eval "$@";
+  done
+}
+
+# Extract based upon file ext
+function ex() {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2) tar xvjf $1   ;;
+      *.tar.gz)  tar xvzf $1   ;;
+      *.bz2)     bunzip2 $1    ;;
+      *.rar)     unrar x $1    ;;
+      *.gz)      gunzip $1     ;;
+      *.tar)     tar xvf $1    ;;
+      *.tbz2)    tar xvjf $1   ;;
+      *.tgz)     tar xvzf $1   ;;
+      *.zip)     unzip $1      ;;
+      *.Z)       uncompress $1 ;;
+      *.7z)      7z x $1       ;;
+      *)         echo "'$1' cannot be extracted via >extract<" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Compress with tar + bzip2
+function bz2 () {
+  tar cvpjf $1.tar.bz2 $1
+}
+
+# Lets you ask a command.
+# ask 'Do you party?' && echo "Cool story bro" || "Try it"
+function ask() {
+  echo -n "$@" '[y/n] ' ; read ans
+  case "$ans" in
+    y*|Y*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+function myip () { 
+ # GNU vs BSD hostname
+ (hostname -i &> /dev/null)
+  if [ $? -eq 0 ]; then
+    echo `hostname -i`
+  else
+    echo `ipconfig getifaddr en0`
+  fi;
+}
+
+# run EDITOR on a script no matter where it is
+function anyvi() {
+  if [ -e "$1" ] || [ -f "$1" ]; then
+    $EDITOR $1
+  else
+    $EDITOR `which $1`
+  fi
+}
+complete -cf anyvi #autocomplete the anyvi command
+
+function music_rsync() {
+  echo "\nBacking up ~/Music/iTunes into the_amazing_library"
+  echo " ------------------------------------------------"
+  rsync -Curt --progress --human-readable ~/Music/iTunes /Volumes/the_amazing_library
+}
+
+
+# Autocomplete man commands
+function listmans_raw() {
+  local manpath_func
+  which manpath &> /dev/null
+  if [ $? -eq 0 ]; then
+    manpath_func='manpath'
+  else
+    manpath_func='man -W 2> /dev/null'
+  fi;
+  for dir in $($manpath_func | /usr/bin/tr ':' '\n'); do
+    find "${dir}" ! -type d -name "*.*" 2>/dev/null | sed -e 's#/.*/##g' | sed -e 's#.[^.]*$##g' | sed -e 's#\.[0123456789].*##g'
+  done
+}
+function regen_man_args() {
+  listmans_raw | sort -u > $MAN_AUTOCOMP_FILE
+}
+function listmans() {
+  if [ ! -f $MAN_AUTOCOMP_FILE ]; then
+    regen_man_args
+  fi;
+  cat $MAN_AUTOCOMP_FILE
+}
+complete -W "$(listmans)" man
+
+#Simple blowfish encryption
+function blow() {
+  [ -z "$1" ] && echo 'Encrypt: blow FILE' && return 1
+  openssl bf-cbc -salt -in "$1" -out "$1.bf"
+}
+function fish() {
+  test -z "$1" -o -z "$2" && echo \
+    'Decrypt: fish INFILE OUTFILE' && return 1
+  openssl bf-cbc -d -salt -in "$1" -out "$2"
+}

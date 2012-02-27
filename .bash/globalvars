@@ -1,0 +1,79 @@
+#!bash
+
+# Global variables
+export EDITOR=`which vim`
+export SVN_EDITOR=`which vim`
+export GIT_EDITOR=`which vim`
+export PAGER=`which less`
+export LS_COLORS="no=00:\
+fi=00:\
+di=01;36:\
+ln=01;36:\
+pi=40;33:\
+so=01;35:\
+do=01;35:\
+bd=40;33;01:\
+cd=40;33;01:\
+or=40;31;01:\
+ex=01;32:\
+*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:\
+*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:\
+*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:\
+*.ogg=01;35:*.mp3=01;35:*.wav=01;35:\
+";
+export GREP_OPTIONS='--color=auto'
+export GIT_CEILING_DIRECTORIES=`echo $HOME | sed 's#/[^/]*$##'`  # Either /home(linux) or /Users(mac)
+export HISTFILESIZE=1000000000
+export HISTSIZE=1000000
+export PROMPT_COMMAND='history -a'
+export BROWSER='chrome'
+export MAN_AUTOCOMP_FILE="/tmp/man_completes_`whoami`"
+
+# export LANG='en_US.utf8'
+if [ -f "$HOME/.inputrc" ]; then
+  export INPUTRC="$HOME/.inputrc"
+fi;
+
+# Export the first java home we find
+(which java &> /dev/null)
+if [ $? -eq 0 ]; then
+  JAVA_IN_PATH=`ls -la "\`which java\`" | sed s/.*-\>[^/]*// | sed s#/bin/java##`
+fi;
+for x in [ $JAVA_IN_PATH ]; do
+  if [ -d $x ]; then
+    export JAVA_HOME=$x
+    break
+  fi
+done
+
+# Export rails version
+(which rails &> /dev/null)
+if [ $? -eq 0 ]; then
+  export RAILS_GEM_VERSION=`rails -v | awk '{print $2}'`
+fi
+
+# Compatability options
+# The BSD sed on mac uses -E, while the GNU one on linux uses -r
+(echo '' | sed -r /GG/g &> /dev/null)
+if [ $? -eq "0" ]; then
+  export SED_EXT='-r'
+else
+  export SED_EXT='-E'
+fi
+
+# GNU vs BSD ls for color
+(ls --color=tty &> /dev/null)
+if [ $? -eq 0 ]; then
+  export LS_COLOR='--color=tty'
+else
+  export LS_COLOR='-G'
+fi;
+
+#GNU vs BSD top command line arguments
+# Delay updates by 10 sec and sort by CPU
+(man top 2>&1 | grep Linux> /dev/null)
+if [ $? -eq 0 ]; then
+  export TOP_OPTIONS='-c -d10'
+else
+  export TOP_OPTIONS='-s10 -ocpu'
+fi;
