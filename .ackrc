@@ -11,9 +11,17 @@
 --color
 --group
 
+# Add jst and eco
+--type-add
+html=.jst,.eco
+
 # Add Sass and Scss
 --type-add
 css=.scss,.sass
+
+# Add coffeescript
+--type-add
+js=.js,.coffee
 
 # Exclude compiled directories
 # --ignore-dir

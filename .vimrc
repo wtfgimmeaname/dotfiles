@@ -31,8 +31,15 @@ set listchars=nbsp:¬,eol:ϟ,tab:--,extends:»,precedes:«,trail:•
 set wildignore+=*.o,.git
 
 fixdel
+" filetype plugin indent on
 filetype on
-filetype plugin on
+
+" -- Testing Code folding
+" set foldmethod=expr
+" set foldexpr=getline(v:lnum)=~'^*:*\->$'&&getline(v:lnum-1)=~'^*:*\->$'
+" set fdm=indent
+" set foldnestmax=2
+" set foldlevel=1
 
 " -- Color scheme generator --
 " Colors live in ~/.vim/colors/
@@ -46,8 +53,8 @@ match OverLength /\%81v.\+/
 autocmd InsertEnter * highlight  CursorLine guifg=none ctermfg=none guibg=none ctermbg=none gui=none cterm=none
 autocmd InsertLeave * highlight  CursorLine guifg=#eeeeee ctermfg=255 guibg=#003853 ctermbg=24  gui=none cterm=none
 
-" Command-T
-let g:CommandTMaxHeight          = 10
-let g:CommandTMaxFiles           = 30000
+" Load third party configs
+:so ~/.vim/src/plugin_configs.vim
 
-:so ~/.vim/src/*
+" Load Nyan cat for funzies
+:so ~/.vim/src/cat.vim

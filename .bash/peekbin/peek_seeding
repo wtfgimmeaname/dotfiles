@@ -1,0 +1,298 @@
+#!bash
+#
+# Peek utilities for installing ec2 tools, aws tools, and rebuilding
+# your local database with the latest backup of the production database.
+# This is our way of seeding.
+#
+# **Note, the installations will add global environment variables
+# to ~/.bash_profile if they don't already exist. These tools will also
+# use or create a ~/.bin directory for hosting the new scripts
+#
+
+# METHODS:
+# Jump to method by searching on the @@#
+# @@1 = mongo_rebuild_peek
+# @@2 = install_ec2ools_for_me_cuz_im_lazy
+# @@3 = gimmie_aws_cuz_im_feckin_tired
+# @@4 = ec2_sanity_check
+
+#
+# @@1 - mongo_rebuild_peek [application]
+# This method first runs ec2_sanity_check to be sure your environment
+# is correctly setup. Then it builds a temp directory, downloads the
+# newest amazon backup of your application and runs a mongo migration.
+#
+function mongo_rebuild_peek() {
+  usage="Usage: mongo_rebuild [ peek|vendor ]"
+
+  ec2_sanity_check # Run to be sure we have everything we need
+  if [ $? -eq 1 ]; then return; fi
+
+  if [ -z `which aws` ]; then
+    echo "
+      ---- FAILED ----
+      You need to install aws tools too HAHAHA!!!! If you wanna do it
+      yourself go here: http://timkay.com/aws/ Or use the tool, execute:
+
+      gimmie_aws_cuz_im_feckin_tired
+    "
+    return 1
+  fi
+
+  if [ "$#" -eq 1 ]
+  then
+    # Build a temp directory to manage data
+    tmpDir=$HOME"/Sites/restoretmp/"
+    `rm -rf $tmpDir && mkdir $tmpDir`
+    echo "Building temp directory..."
+
+    # Set source locations and get most recent backup filename
+    sourceBucketName="mongohq_backup/"
+    sourceBucketDir="mongohq_backups/"
+    sourceFileName=`aws ls mongohq_backup | grep $1 | tail -1 | awk ' { print $7 } ' | cut -d "/" -f2`
+    sourceBucketFile=$sourceBucketName$sourceBucketDir$sourceFileName
+    echo "Received source file: $sourceBucketFile"
+
+    # Build db varables and exclusion array based upon which app
+    rmArr=("system.users.bson" "system.indexes.bson")
+    cutLength=1
+
+    case $1 in
+      peek)
+        dbName=peek_development
+        rmArr=(
+          "${rmArr[@]}"
+          "authentications.bson"
+          "delayed_backend_mongoid_jobs.bson"
+        )
+      ;;
+      vendor)
+        dbName=ninjatravelco_development
+        rmArr=(
+          "${rmArr[@]}"
+          "beta_codes.bson"
+          "delayed_backend_mongoid_jobs.bson"
+        )
+        cutLength=2
+      ;;
+      rec) dbName=rec_development ;;
+      *)
+        echo $usage
+        return
+    esac
+
+    # Set target locations
+    targetFilesDirName=`echo $sourceFileName | cut -d "_" -f -$cutLength`
+    targetFilesPath=$tmpDir$targetFilesDirName
+
+    # Download and untar files into source
+    echo "Downloading latest backup from amazon..."
+    `aws get $sourceBucketFile $tmpDir`
+    `tar -xvzf $tmpDir$sourceFileName -C $tmpDir`
+
+    # Remove unwanted migration files
+    for fname in ${rmArr[@]}; do `rm "$targetFilesPath/$fname"`; done
+
+    echo "
+
+      -------------------`date`--------------------" >> $HOME"/.miglogs.txt"
+    `mongorestore -d $dbName $targetFilesPath --drop >> $HOME/.miglogs.txt`
+    `mongo $dbName --eval "db.delayed_backend_mongoid_jobs.remove()" &> /dev/null`
+    `rm -rf $tmpDir`
+
+    echo
+    echo "
+      Check your logs in ~/.miglog.txt
+
+      Next steps:
+      - Start mongo then your peek and vendor apps
+      - Clear and start your worker queue
+      - Execute:
+          'rails runner ActivityPush.new.perform'
+      - Once finished, it is recommend that you restart mongo and your apps
+    "
+  else
+    echo
+    echo "What database are you rebuilding dummy?"
+    echo $usage
+    echo
+  fi
+}
+
+#
+# @@2 - install_ec2ools_for_me_cuz_im_lazy
+# This installs the newest version of the ec2 api tools from amazon
+# and setups up the necessary environment variables in your bash profile.
+# This method will require you to do a few things online. Read carefully.
+#
+function install_ec2ools_for_me_cuz_im_lazy() {
+  homeBin=$HOME/.bin
+  if [ ! -d $homeBin ]; then
+    `mkdir $homeBin && echo "export PATH=\$PATH:\$HOME/.bin" >> $HOME/.bash_profile`
+  fi
+
+  zipFile="ec2-api-tools.zip"
+
+  # Download and install the api tools into ~/bin
+  tURL="http://s3.amazonaws.com/ec2-downloads/$zipFile"
+  if [ ! -f $homeBin/$zipFile ]; then
+    `cd $homeBin && curl -Ov $tURL`
+  fi
+  `cd $homeBin && unzip $zipFile &> /dev/null`
+
+  # Add bin to path and re-source
+  toolBin=`cd $homeBin && find ec2-api* -type d | head -1`
+  if [ -z $EC2_HOME ]; then
+    echo "export EC2_HOME=\$HOME/.bin/$toolBin/bin" >> $HOME/.bash_profile
+    echo "export PATH=\$PATH:\$EC2_HOME" >> $HOME/.bash_profile
+  fi
+  `source ~/.bash_profile`
+
+  # Build EC2 private key and certificate
+  keyDir=$HOME/.ec2
+  if [ ! -d $keyDir ]; then `mkdir $keyDir`; fi
+  echo "
+    Do the follwing things:
+      1. Go to the following URL and create new X.509 certs:
+        https://portal.aws.amazon.com/gp/aws/securityCredentials
+      2. Download both the pk-##.pem and cert-###.pem files
+      3. Place those two files into $HOME/.ec2/
+
+    Once you have completed this incredibly simple task,
+    type "FINISHED" into this black screen and hit the return key.
+  "
+  read userInput
+
+  if [ -z $userInput ] || [ ! $userInput = "FINISHED" ]; then
+    echo "
+      What happen?! Task not mundane enough for ya?
+      Find an adult.
+    "
+    return
+  fi
+
+  # Confirm keys exist and set ENV vars
+  privateKey=`find $keyDir -type f -name 'pk-*' | head -1 | awk -F/ '{ print $NF }'`
+  certifiKey=`find $keyDir -type f -name 'cert-*' | head -1 | awk -F/ '{ print $NF }'`
+
+  if [ -z $privateKey ] || [ -z $certifiKey ]; then
+    echo "One of your key files didn't make it. Find an adult."
+    return
+  fi
+
+  if [ -z "$EC2_PRIVATE_KEY" ] || [ -z "$EC2_CERT" ]; then
+    echo "
+      You have global environment variables set for your
+      certs already. If the files are installed in ~/.ec2
+      you can continue. Are they? (y/n)
+
+      Check with: 'ls -l ~/.ec2'
+    "
+    read keysAreGood
+    if [ -z $keysAreGood ] || [ ! $keysAreGood = "y" ]; then
+      echo "Cancelling. Find an adult."
+      return
+    else
+      echo "Using existing ec2 private key and cert..."
+    fi
+  else
+    echo "export EC2_PRIVATE_KEY=$keyDir/$privateKey" >> $HOME/.bash_profile
+    echo "export EC2_CERT=$keyDir/$certifiKey" >> $HOME/.bash_profile
+    echo "Added ec2 private key and cert to your bash profile..."
+  fi
+  `source ~/.bash_profile`
+
+  echo "
+    ---------------------------------------------
+    Installation of the ec2 api tools is complete
+
+    Execute: 'ec2-describe-regions'
+
+    ...to be sure they installed correctly. If you get a region list from
+    Amazon, you're good to go, run 'mongo_rebuild_peek' again. If it didn't
+    work, ask for help.
+  "
+}
+
+#
+# @@3 - gimmie_aws_cuz_im_feckin_tired
+# Curls and installs the timkay aws wrapper methods into ~/.bin
+# This method sets up the necessary config files for making soap
+# calls to amazon s3.
+#
+function gimmie_aws_cuz_im_feckin_tired() {
+  homeBin=$HOME/.bin
+  if [ ! -d $homeBin ]; then
+    `mkdir $homeBin && echo "export PATH=\$PATH:\$HOME/.bin" >> $HOME/.bash_profile`
+  fi
+
+  if [ ! -f $homeBin/aws ]; then
+    `cd $homeBin && curl https://raw.github.com/timkay/aws/master/aws -o aws && chmod ug+x aws`
+  fi
+
+  ec2_sanity_check # Run to be sure we have everything we need
+  if [ $? -eq 1 ]; then return; fi
+
+  `echo $S3_KEY > $HOME/.awssecret && echo $S3_SECRET >> $HOME/.awssecret && chmod 600 $HOME/.awssecret`
+  `source ~/.bash_profile`
+
+  echo "
+    --------------------------------------------
+    Installation of the aws s3 tools is complete
+
+    Execute: 'aws'
+
+    ...to be sure they installed correctly. If you get an options menu
+    you're good to go, run 'mongo_rebuild_peek' again. If it didn't work,
+    ask for help.
+  "
+}
+
+#
+# @@4 - ec2_sanity_check
+# Run necessary checks for environment variables and methods needed
+# to run the mongo rebuild of peek data. Run this at any time.
+#
+function ec2_sanity_check() {
+  `source ~/.bash_profile`
+
+  if [ -z "$JAVA_HOME" ]; then
+    echo "
+      ---- FAILED ----
+      Please set your JAVA_HOME environment variable
+    "
+    return 1
+  fi
+
+  if [ -z "$EC2_HOME" ]; then
+    echo "
+      ---- FAILED ----
+      Please set your EC2_HOME to point to your EC2 api tools bin.
+      Or if you're lazy and you haven't installed the tools, execute:
+
+      install_ec2ools_for_me_cuz_im_lazy
+    "
+    return 1
+  fi
+
+  if [ -z "$EC2_PRIVATE_KEY" ] || [ -z "$EC2_CERT" ]; then
+    echo "
+      ---- FAILED ----
+      Your feckin keys are missing. Did you correctly install ec2 certs (X.501)?
+      Find an adult.
+    "
+    return 1
+  fi
+
+  if [ -z $S3_KEY ] || [ -z $S3_SECRET ]; then
+    echo "
+      ---- FAILED ----
+      Please set your global S3 peek variables. If you don't know how...
+      Find an adult.
+    "
+    return 1
+  fi
+
+  echo "Passed sanity check..."
+  return 0
+}
