@@ -2,6 +2,7 @@
 ZSH=$HOME/.zsh
 ZSH_THEME="random"
 COMPLETION_WAITING_DOTS="true"
+DISABLE_AUTO_TITLE=true
 
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(tmux)

@@ -64,7 +64,7 @@ add_pre_path() { export PATH="$1:$PATH"; }
 add_path /usr/local/bin:$HOME/.rvm/bin:$HOME/bin:$HOME/bin/tmux-1.5:$HOME/bin/pv-1.3.1
 add_pre_path /usr/local/git/bin:$HOME/bin/vim73/src
 
-source $ZSH/peek/peek.zsh # Add work stuff
+source $ZSH/lib/work.zsh # Add work stuff
 
 # remove duplicate path entries and preserve PATH order
 export PATH=$(echo $PATH | awk -F: '

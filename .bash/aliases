@@ -1,18 +1,19 @@
 #!bash
 
 #Aliases
-alias c='clear'
 alias ls='ls -h $LS_COLOR'
 alias la='ls -lah $LS_COLOR'
 alias ll='ls -lh $LS_COLOR'
-alias rm='rm -i'
-alias ssh='ssh -A'
 alias top='top $TOP_OPTIONS'
 alias topme='top -u dustin'
-alias rcopy='rsync -az --stats --progress --delete'
 alias ..='cl ..'
-alias trim_whitespace='sed -i "s/[ \t]*$//" '
 alias resource="source ~/.bash_profile"
+
+# Config shortcuts
+alias vimrc="vim ~/.vimrc"
+alias vimdr="vim ~/.vim/"
+alias zshrc="vim ~/.zshrc"
+alias zshdr="vim ~/.zsh/"
 
 alias g='git'
 alias gst='git status'
@@ -22,7 +23,6 @@ alias gc='git commit'
 alias gcam='gc --amend'
 alias gpl='git pull'
 alias gph='git push'
-alias gethead='git rev-parse HEAD'
 alias gg='git grep'
 alias gdf='git diff'
 alias gdfc='git diff --cached'
@@ -33,8 +33,8 @@ alias gsl='git stash list'
 alias gss='git stash save'
 alias gsa='git stash apply'
 alias gsd='git stash drop'
-
 alias glg='git log --graph --decorate --oneline'
+
 alias gitv='git log -1 | head -1 | awk "{print \$2}"'
 alias unmerged='vim $(gst | ack unmerged | cut -d : -f 2)'
 

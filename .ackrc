@@ -17,7 +17,7 @@ html=.jst,.eco
 
 # Add Sass and Scss
 --type-add
-css=.scss,.sass
+css=.scss,.sass,.less
 
 # Add coffeescript
 --type-add

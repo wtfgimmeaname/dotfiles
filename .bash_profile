@@ -10,16 +10,15 @@ if [ -f ~/.bashrc ]; then
   source ~/.bashrc
 fi
 
+# Always be vimming
+export EDITOR=vim
+
 # Construct Path
 export PATH=/usr/local/bin:~/bin:$PATH
 add_path() { export PATH="$PATH:$1"; }
 add_pre_path() { export PATH="$1:$PATH"; }
 
-# My bin, tmux, vim and git
-add_path $HOME/bin
-add_path $HOME/bin/tmux-1.5
-add_pre_path $HOME/bin/vim73/src
-add_pre_path /usr/local/git/bin
+add_path $HOME/bin # My bin which includes tmux, vim and git if necessary
 
 # Source global variables and aliases
 source $HOME/.bash/globalvars
@@ -28,7 +27,7 @@ source $HOME/.bash/utils
 source $HOME/.bash/gitcompletion
 source $HOME/.bash/tmuxcommands
 source $HOME/.bash/term_colors
-source $HOME/.bash/peek # Peek work
+source $HOME/.bash/work
 
 # Options
 shopt -s checkwinsize
@@ -48,12 +47,6 @@ export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export PS1="$N\t$W|"'$(__git_ps1 " (%s) ")'"$PROMPT_COLOR\u@\h$N:$MY\W$N"'$CURSOR_PROMPT '
 export PROMPT_COMMAND='if [ $? -ne 0 ]; then CURSOR_PROMPT="^"; else CURSOR_PROMPT=" "; fi'
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
-
-# Java && EC2
-export JAVA_HOME=/Library/Java/Home
-add_path $EC2_HOME/bin/
 
 # remove duplicate path entries and preserve PATH order
 export PATH=$(echo $PATH | awk -F: '

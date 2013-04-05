@@ -45,11 +45,11 @@ filetype on                    " filetype plugin indent on
 :so ~/.vim/src/cat.vim            " Load Nyan cat for funzies
 
 " -- Code folding
-set fdm=indent
-set fdc=4
-set fdn=2
-set fml=2
-set fdl=1
+set fdm=indent  " <foldmethod>   Type of folding to use
+set fdc=2       " <foldcolumn>   Width of side column
+set fdn=3       " <foldnextmax>  Max number of nesting folds
+set fml=2       " <foldminlines> Min number of lines for a fold to be built
+set fdl=1       " <foldlevel>    Level of folds to close
 
 " -- Color scheme generator --
 " Colors live in ~/.vim/colors/ -- http://bytefluent.com/vivify/

@@ -13,3 +13,12 @@
 
 [rerere]
   enabled = 1
+
+[branch]
+  autosetuprebase = always
+
+[push]
+  default = tracking
+
+[alias]
+  lgg = log --graph --pretty=format:'%Cred%h%Creset %C(yellow)%an%d%Creset %s %Cgreen(%cr)%Creset' --date=relative

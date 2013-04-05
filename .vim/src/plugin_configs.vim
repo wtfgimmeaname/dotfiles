@@ -1,9 +1,19 @@
+" THINGS TO DOWNLOAD
+" pathogen
+" ctrl-p (Sorry Wincent)
+" fugitive, surround, nerd tree, ack
+" syntastic, vim-coffee, vim-less, vim-powerline
+
 " Pathogen load
 call pathogen#infect()
 
-" Command-T
-let g:CommandTMaxHeight          = 10
-let g:CommandTMaxFiles           = 30000
+" Ctrl-P
+set runtimepath^=~/.vim/bundle/ctrlp.vim
+let g:ctrlp_prompt_mappings = { 'PrtSelectMove("j")':   ['<c-m>', '<down>'] }
+let g:ctrlp_custom_ignore = {
+  \ 'dir': '\v[\/]\.(git|hg|svn)$',
+  \ 'file': '\v\.(js|pyc)$'
+\ }
 
 " NERDTree
 nmap <silent> <c-n> :NERDTreeToggle<CR>

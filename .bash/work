@@ -1,0 +1,27 @@
+#!bash
+
+
+### PEEK
+# Peek welcomer
+# export PATH=$PATH:~/Sites/superpeek/bin
+
+# Aliases
+#alias workerstart="RAILS_ENV=development script/delayed_job -m --sleep-delay=10 start"
+#alias workerstop="RAILS_ENV=development script/delayed_job stop"
+#alias workerwatch="tail -f log/delayed_job.log"
+
+# Peek dev boxes
+#export PEEK_USER_URL="http://localhost:3000/"
+#export PEEK_BIZ_URL="http://localhost:3005/api/"
+#export PEEK_FEEDER_URL="http://localhost:3015/"
+
+#source $HOME/.bash/peekbin/peek_seeding
+
+### UBER
+
+export UBER_HOME="/usr/local/Cellar/uber-home/HEAD"
+
+export PATH="$PATH:$(brew --prefix)/share/npm/bin:/usr/local/mysql/bin"
+export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:/usr/local/mysql/lib"
+
+source `which virtualenvwrapper.sh`
