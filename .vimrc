@@ -6,7 +6,8 @@ set nowrap                " <nowrap>     Don't wrap lines
 set wmnu                  " <wildmenu>   Show tab completion when in menu
 set wim=longest:full,full " <wildmode>   Complete full option.
 set wig+=*.o,.git         " <wildignore> Files to ignore when autocompleting
-set history=100           " <history>    History backlog. Default is 20
+set history=100           " <history>    History backlog. Default is 
+set t_Co=256              "              Number of colors
 
 " Preferred spacing and shifting options
 set sw=2   " <shiftwidth> Number of spaces per tab for auto indent
